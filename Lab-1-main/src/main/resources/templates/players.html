@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><!DOCTYPE html>
+        <html xmlns:th="http://www.thymeleaf.org">
+        <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Igrači - Sports Streaming</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        nav {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            text-decoration: none;
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        nav a:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .btn-add {
+            background: #10b981 !important;
+        }
+
+        .btn-add:hover {
+            background: #059669 !important;
+        }
+
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.3s;
+        }
+
+        tbody tr:hover {
+            background: #f8f9ff;
+        }
+
+        .jersey-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .position-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .position-badge.forward {
+            background: #fee;
+            color: #c00;
+        }
+
+        .position-badge.midfielder {
+            background: #efe;
+            color: #060;
+        }
+
+        .position-badge.defender {
+            background: #eef;
+            color: #006;
+        }
+
+        .position-badge.goalkeeper {
+            background: #ffe;
+            color: #990;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-edit {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2563eb;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>⚽ Lista Igrača</h1>
+        <nav>
+            <a href="/teams">Timovi</a>
+            <a href="/matches">Utakmice</a>
+            <a href="/players">Igrači</a>
+            <a href="/players/new" class="btn-add">+ Dodaj Igrača</a>
+        </nav>
+    </header>
+
+    <table th:if="${!players.empty}">
+        <thead>
+        <tr>
+            <th>Broj</th>
+            <th>Ime</th>
+            <th>Pozicija</th>
+            <th>Tim</th>
+            <th>Nacionalnost</th>
+            <th>Datum rođenja</th>
+            <th>Akcije</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="player : ${players}">
+            <td>
+                <span class="jersey-number" th:text="${player.jerseyNumber}">10</span>
+            </td>
+            <td th:text="${player.name}">Ime Igrača</td>
+            <td>
+                        <span class="position-badge"
+                              th:classappend="${player.position.toLowerCase().contains('napad') ? 'forward' : 
+                                              player.position.toLowerCase().contains('vezni') ? 'midfielder' : 
+                                              player.position.toLowerCase().contains('odbran') ? 'defender' : 'goalkeeper'}"
+                              th:text="${player.position}">
+                            Pozicija
+                        </span>
+            </td>
+            <td th:text="${player.team != null ? player.team.name : 'Bez tima'}">Tim</td>
+            <td th:text="${player.nationality}">Država</td>
+            <td th:text="${#temporals.format(player.dateOfBirth, 'dd.MM.yyyy')}">01.01.1995</td>
+            <td>
+                <div class="actions">
+                    <a th:href="@{/players/edit/{id}(id=${player.id})}" class="btn btn-edit">Izmijeni</a>
+                    <a th:href="@{/players/delete/{id}(id=${player.id})}"
+                       class="btn btn-delete"
+                       onclick="return confirm('Da li ste sigurni da želite obrisati ovog igrača?')">
+                        Obriši
+                    </a>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="empty-state" th:if="${players.empty}">
+        <h2>Nema dodanih igrača</h2>
+        <p>Kliknite na dugme "Dodaj Igrača" da dodate prvog igrača.</p>
+    </div>
+</div>
+</body>
+</html>
+</title>
+</head>
+<body>
+
+</body>
+</html>

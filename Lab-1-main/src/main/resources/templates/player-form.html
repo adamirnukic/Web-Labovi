@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${player.id != null ? 'Izmijeni Igrača' : 'Dodaj Igrača'}">Forma za Igrača</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button, .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+
+        button[type="submit"] {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-cancel {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-cancel:hover {
+            background: #d0d0d0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="form-card">
+        <h1 th:text="${player.id != null ? '✏️ Izmijeni Igrača' : '➕ Dodaj Novog Igrača'}">Forma za Igrača</h1>
+
+        <form th:action="@{/players/save}" th:object="${player}" method="post">
+            <input type="hidden" th:field="*{id}">
+
+            <div class="form-group">
+                <label for="name">Ime i prezime *</label>
+                <input type="text" id="name" th:field="*{name}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="position">Pozicija *</label>
+                <select id="position" th:field="*{position}" required>
+                    <option value="">Odaberite poziciju</option>
+                    <option value="Golman">Golman</option>
+                    <option value="Desni bek">Desni bek</option>
+                    <option value="Lijevi bek">Lijevi bek</option>
+                    <option value="Štoper">Štoper</option>
+                    <option value="Defanzivni vezni">Defanzivni vezni</option>
+                    <option value="Centralni vezni">Centralni vezni</option>
+                    <option value="Ofanzivni vezni">Ofanzivni vezni</option>
+                    <option value="Desno krilo">Desno krilo</option>
+                    <option value="Lijevo krilo">Lijevo krilo</option>
+                    <option value="Napadač">Napadač</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="jerseyNumber">Broj dresa *</label>
+                <input type="number" id="jerseyNumber" th:field="*{jerseyNumber}" min="1" max="99" required>
+            </div>
+
+            <div class="form-group">
+                <label for="team">Tim *</label>
+                <select id="team" th:field="*{team.id}" required>
+                    <option value="">Odaberite tim</option>
+                    <option th:each="team : ${teams}"
+                            th:value="${team.id}"
+                            th:text="${team.name}">
+                        Tim
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="dateOfBirth">Datum rođenja</label>
+                <input type="date" id="dateOfBirth" th:field="*{dateOfBirth}">
+            </div>
+
+            <div class="form-group">
+                <label for="nationality">Nacionalnost</label>
+                <input type="text" id="nationality" th:field="*{nationality}">
+            </div>
+
+            <div class="button-group">
+                <button type="submit" th:text="${player.id != null ? 'Sačuvaj izmjene' : 'Dodaj igrača'}">
+                    Sačuvaj
+                </button>
+                <a href="/players" class="btn btn-cancel">Otkaži</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

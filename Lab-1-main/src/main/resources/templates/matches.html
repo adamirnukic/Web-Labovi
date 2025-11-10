@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utakmice - Sports Streaming</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        nav {
+            margin-top: 15px;
+        }
+
+        nav a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            transition: background 0.3s;
+        }
+
+        nav a:hover {
+            background: #764ba2;
+        }
+
+        .matches-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .match-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .match-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+        }
+
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .match-teams {
+            font-size: 1.3em;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .vs {
+            color: #667eea;
+            margin: 0 10px;
+        }
+
+        .live-badge {
+            background: #ff4444;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .match-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .match-details p {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            font-size: 0.95em;
+        }
+
+        .btn-start {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-start:hover {
+            background: #45a049;
+        }
+
+        .btn-stop {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #da190b;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>📺 Sports Streaming - Utakmice</h1>
+        <nav>
+            <a href="/teams">Timovi</a>
+            <a href="/matches">Utakmice</a>
+            <a href="/players">Igrači</a>
+        </nav>
+    </header>
+
+    <div class="matches-list">
+        <div class="match-card" th:each="match : ${matches}">
+            <div class="match-header">
+                <div class="match-teams">
+                    <span th:text="${match.homeTeam.name}">Domaćin</span>
+                    <span class="vs">vs</span>
+                    <span th:text="${match.awayTeam.name}">Gost</span>
+                </div>
+                <span class="live-badge" th:if="${match.isLive()}">🔴 LIVE</span>
+            </div>
+
+            <div class="match-details">
+                <p>
+                    <strong>🏆 Takmičenje:</strong>
+                    <span th:text="${match.competition}">Takmičenje</span>
+                </p>
+                <p>
+                    <strong>🏟️ Stadion:</strong>
+                    <span th:text="${match.stadium}">Stadion</span>
+                </p>
+                <p>
+                    <strong>📅 Datum:</strong>
+                    <span th:text="${#temporals.format(match.matchDate, 'dd.MM.yyyy HH:mm')}">Datum</span>
+                </p>
+            </div>
+
+            <div class="actions">
+                <a th:href="@{/matches/start/{id}(id=${match.id})}"
+                   class="btn btn-start"
+                   th:if="${!match.isLive()}">
+                    ▶️ Pokreni Stream
+                </a>
+                <a th:href="@{/matches/stop/{id}(id=${match.id})}"
+                   class="btn btn-stop"
+                   th:if="${match.isLive()}">
+                    ⏹️ Zaustavi Stream
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akcija - Sports Streaming</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .action-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            color: #4CAF50;
+        }
+
+        .error {
+            color: #f44336;
+        }
+
+        .stopped {
+            color: #ff9800;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .message {
+            color: #555;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .match-info {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .match-info h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .match-info p {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .match-teams {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .vs {
+            color: #667eea;
+            margin: 0 10px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            font-size: 1em;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #764ba2;
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+<div class="action-container">
+    <div th:if="${action == 'started'}" class="icon success">✅</div>
+    <div th:if="${action == 'stopped'}" class="icon stopped">⏹️</div>
+    <div th:if="${action == 'error'}" class="icon error">❌</div>
+
+    <h1 th:text="${action == 'started' ? 'Stream Pokrenut!' : (action == 'stopped' ? 'Stream Zaustavljen!' : 'Greška!')}">
+        Akcija
+    </h1>
+
+    <p class="message" th:text="${message}">Poruka o akciji</p>
+
+    <div class="match-info" th:if="${match != null}">
+        <h2>Detalji Utakmice</h2>
+        <div class="match-teams">
+            <span th:text="${match.homeTeam.name}">Domaćin</span>
+            <span class="vs">vs</span>
+            <span th:text="${match.awayTeam.name}">Gost</span>
+        </div>
+        <p><strong>🏆 Takmičenje:</strong> <span th:text="${match.competition}">Takmičenje</span></p>
+        <p><strong>🏟️ Stadion:</strong> <span th:text="${match.stadium}">Stadion</span></p>
+        <p><strong>📅 Datum:</strong> <span th:text="${#temporals.format(match.matchDate, 'dd.MM.yyyy HH:mm')}">Datum</span></p>
+        <p><strong>📡 Status:</strong>
+            <span th:if="${match.isLive()}" style="color: #ff4444; font-weight: bold;">🔴 LIVE</span>
+            <span th:unless="${match.isLive()}" style="color: #999;">⚫ Offline</span>
+        </p>
+    </div>
+
+    <div class="actions">
+        <a href="/matches" class="btn btn-primary">📺 Nazad na Utakmice</a>
+        <a href="/teams" class="btn btn-secondary">⚽ Pogledaj Timove</a>
+        <a href="/players" class="btn btn-secondary">👥 Pogledaj Igrače</a>
+    </div>
+</div>
+</body>
+</html>
