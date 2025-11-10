@@ -1,52 +1,101 @@
-# Lab-1
+## 📝 Lab 2 - Logika dodavanja novog modela
 
-# 📺 Sports Streaming App
+### Dodavanje Player modela
+**Razlog dodavanja:** Model Player je logično proširenje aplikacije jer omogućava prikaz pojedinačnih igrača koji čine timove. Svaki sportski tim se sastoji od igrača, tako da je ova relacija prirodna i očekivana u ovoj domeni.
 
-## 👥 Članovi tima
-- **Abida Biogradlija**: Odgovoran za Model Team + rute + view lista timova
-- **Adamir Nukić**: Odgovoran za Model Match + rute + view lista utakmica
-- **Zajedničko**: Akcija pokretanja/zaustavljanja stream-a + stranica akcije
+**Ostvarena relacija:** **N:1 (Many-to-One)** između Player i Team modela
+- Više igrača pripada jednom timu
+- Svaki igrač mora biti dio tačno jednog tima
+- Implementirano kroz `@ManyToOne` anotaciju na strani Player modela
+- Tim ima listu igrača kroz `@OneToMany` anotaciju sa `mappedBy = "team"`
 
-## 📋 Opis aplikacije
-Mini MVC Spring Boot aplikacija za streaming sportskih prenosa. Aplikacija omogućava pregled timova i utakmica, kao i pokretanje/zaustavljanje live stream-a utakmica.
+**JPA anotacije:**
+\`\`\`java
+// U Player.java
+@ManyToOne
+@JoinColumn(name = "team_id")
+private Team team;
 
-## 🏗️ Modeli i relacije
+// U Team.java
+@OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
+private List<Player> players = new ArrayList<>();
+\`\`\`
 
-### Model: Team (Tim)
-**Atributi:**
-- `id` (Long) - Jedinstveni identifikator tima
-- `name` (String) - Naziv tima
-- `country` (String) - Država tima
-- `coach` (String) - Ime trenera
-- `foundedYear` (Integer) - Godina osnivanja
+---
 
-### Model: Match (Utakmica)
-**Atributi:**
-- `id` (Long) - Jedinstveni identifikator utakmice
-- `homeTeam` (Team) - Domaći tim
-- `awayTeam` (Team) - Gostujući tim
-- `matchDate` (LocalDateTime) - Datum i vrijeme utakmice
-- `stadium` (String) - Naziv stadiona
-- `competition` (String) - Naziv takmičenja
-- `isLive` (boolean) - Status stream-a (da li je uživo)
+## 🎮 Funkcionalnosti Controller-a za Player model
 
-### 🔗 Relacija
-**Team 1:N Match** - Jedan tim može učestvovati u više utakmica (kao domaćin ili gost)
+### 1. PlayerController (Thymeleaf MVC Controller)
+**Namjena:** Upravljanje HTML stranicama i formama za igrače
 
-## 🛣️ Rute
+**Rute:**
+- `GET /players` - Prikaz liste svih igrača
+- `GET /players/new` - Forma za dodavanje novog igrača
+- `GET /players/edit/{id}` - Forma za izmjenu postojećeg igrača
+- `POST /players/save` - Čuvanje novog ili izmijenjenog igrača
+- `GET /players/delete/{id}` - Brisanje igrača
 
-| Ruta | Metoda | Opis |
-|------|--------|------|
-| `/` | GET | Redirect na `/matches` |
-| `/teams` | GET | Prikaz liste svih timova |
-| `/matches` | GET | Prikaz liste svih utakmica |
-| `/matches/start/{id}` | GET | Pokretanje stream-a za utakmicu |
-| `/matches/stop/{id}` | GET | Zaustavljanje stream-a za utakmicu |
+**Ključne funkcionalnosti:**
+- Prikaz svih igrača sa njihovim timovima u tabeli
+- Forma za unos/izmjenu igrača sa padajućim menijem za izbor tima
+- Validacija podataka
+- Potvrda pri brisanju igrača
+- Responzivan dizajn sa obojenim oznakama za pozicije
 
-## ✨ Funkcionalnosti
-- ✅ Pregled svih timova sa detaljnim informacijama
-- ✅ Pregled svih utakmica sa statusom stream-a
-- ✅ Pokretanje live stream-a za utakmicu
-- ✅ Zaustavljanje live stream-a
-- ✅ Responzivan dizajn
-- ✅ In-memory podaci (bez potrebe za bazom)
+### 2. PlayerRestController (REST API Controller)
+**Namjena:** JSON API za programatski pristup podacima o igračima
+
+**REST Endpoint-i:**
+- `GET /api/players` - Vraća sve igrače u JSON formatu
+- `GET /api/players/{id}` - Vraća jednog igrača po ID-u
+- `GET /api/players/team/{teamId}` - Vraća sve igrače određenog tima
+- `POST /api/players` - Kreira novog igrača (prima JSON)
+- `PUT /api/players/{id}` - Ažurira postojećeg igrača (prima JSON)
+- `DELETE /api/players/{id}` - Briše igrača
+
+**Primjer JSON odgovora:**
+\`\`\`json
+{
+  "id": 1,
+  "name": "Edin Džeko",
+  "position": "Napadač",
+  "jerseyNumber": 11,
+  "dateOfBirth": "1986-03-17",
+  "nationality": "Bosna i Hercegovina",
+  "team": {
+    "id": 1,
+    "name": "FK Sarajevo",
+    "country": "Bosna i Hercegovina",
+    "coach": "Vinko Marinović",
+    "foundedYear": 1946
+  }
+}
+\`\`\`
+
+---
+
+## 💾 Konfiguracija baze podataka
+
+### MySQL Database
+**Preduslovi:**
+1. Instaliran MySQL Server (verzija 8.0 ili novija)
+2. Pokrenuti MySQL servis
+3. Kreirana baza podataka `sports_streaming_db`
+
+**Kreiranje baze podataka:**
+\`\`\`sql
+CREATE DATABASE sports_streaming_db;
+\`\`\`
+
+**Konfiguracija** (`application.properties`):
+```properties
+# MySQL Database Configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/sports_streaming_db?useSSL=false&serverTimezone=UTC
+spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
+spring.datasource.username=root
+spring.datasource.password=root
+
+# JPA Configuration
+spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
