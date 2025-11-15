@@ -1,17 +1,37 @@
 package lab1.sportprenos.model;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+@Entity
+@Table(name = "matches")
 public class Match {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "home_team_id")
     private Team homeTeam;
+
+    @ManyToOne
+    @JoinColumn(name = "away_team_id")
     private Team awayTeam;
+
     private LocalDateTime matchDate;
     private String stadium;
     private String competition;
     private boolean isLive;
 
-    public Match(Long id, Team homeTeam, Team awayTeam, LocalDateTime matchDate, String stadium, String competition, boolean isLive) {
+
+    public Match() {
+    }
+
+    public Match(Long id, Team homeTeam, Team awayTeam, LocalDateTime matchDate,
+                 String stadium, String competition, boolean isLive) {
         this.id = id;
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
@@ -67,6 +87,10 @@ public class Match {
 
     public void setCompetition(String competition) {
         this.competition = competition;
+    }
+
+    public boolean getIsLive() {
+        return isLive;
     }
 
     public boolean isLive() {

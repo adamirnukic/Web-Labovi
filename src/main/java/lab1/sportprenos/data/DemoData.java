@@ -2,73 +2,91 @@ package lab1.sportprenos.data;
 
 import lab1.sportprenos.model.Match;
 import lab1.sportprenos.model.Team;
+import lab1.sportprenos.model.Player;
+import lab1.sportprenos.repository.MatchRepository;
+import lab1.sportprenos.repository.TeamRepository;
+import lab1.sportprenos.repository.PlayerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
 
 @Component
-public class DemoData {
+public class DemoData implements CommandLineRunner {
 
-    private static List<Team> teams = new ArrayList<>();
-    private static List<Match> matches = new ArrayList<>();
+    @Autowired
+    private TeamRepository teamRepository;
 
-    static {
-        teams.add(new Team(1L, "FK Sarajevo", "Bosna i Hercegovina", "Vinko Marinović", 1946));
-        teams.add(new Team(2L, "FK Željezničar", "Bosna i Hercegovina", "Amar Osim", 1921));
-        teams.add(new Team(3L, "FK Zrinjski", "Bosna i Hercegovina", "Blaž Slišković", 1905));
-        teams.add(new Team(4L, "FK Velež", "Bosna i Hercegovina", "Saša Zorić", 1922));
-        teams.add(new Team(5L, "FK Borac", "Bosna i Hercegovina", "Mladen Žižović", 1926));
+    @Autowired
+    private MatchRepository matchRepository;
 
-        matches.add(new Match(1L, teams.get(0), teams.get(1),
-                LocalDateTime.now().plusDays(1), "Stadion Asim Ferhatović Hase", "Premijer Liga BIH", false));
+    @Autowired
+    private PlayerRepository playerRepository;
 
-        matches.add(new Match(2L, teams.get(2), teams.get(3),
-                LocalDateTime.now().plusDays(2), "Stadion pod Bijelim Brijegom", "Premijer Liga BIH", false));
-
-        matches.add(new Match(3L, teams.get(4), teams.get(0),
-                LocalDateTime.now().plusDays(3), "Gradski stadion Banja Luka", "Premijer Liga BIH", false));
-
-        matches.add(new Match(4L, teams.get(1), teams.get(2),
-                LocalDateTime.now().plusHours(2), "Stadion Grbavica", "Kup BIH", true));
-
-        matches.add(new Match(5L, teams.get(3), teams.get(4),
-                LocalDateTime.now().plusDays(5), "Stadion Rođeni", "Premijer Liga BIH", false));
-    }
-
-    public List<Team> getAllTeams() {
-        return teams;
-    }
-
-    public List<Match> getAllMatches() {
-        return matches;
-    }
-
-    public Team getTeamById(Long id) {
-        return teams.stream()
-                .filter(team -> team.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-    }
-
-    public Match getMatchById(Long id) {
-        return matches.stream()
-                .filter(match -> match.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-    }
-
-    public void startStream(Long matchId) {
-        Match match = getMatchById(matchId);
-        if (match != null) {
-            match.setLive(true);
+    @Override
+    public void run(String... args) throws Exception {
+        if (teamRepository.count() > 0 || matchRepository.count() > 0 || playerRepository.count() > 0) {
+            System.out.println("Baza podataka već sadrži podatke. Preskačem inicijalizaciju.");
+            return;
         }
-    }
 
-    public void stopStream(Long matchId) {
-        Match match = getMatchById(matchId);
-        if (match != null) {
-            match.setLive(false);
-        }
+        System.out.println("🔄 Baza podataka je prazna. Inicijalizujem demo podatke...");
+
+        Team sarajevo = teamRepository.save(new Team(null, "FK Sarajevo", "Bosna i Hercegovina", "Vinko Marinović", 1946));
+        Team zeljeznicar = teamRepository.save(new Team(null, "FK Željezničar", "Bosna i Hercegovina", "Amar Osim", 1921));
+        Team velez = teamRepository.save(new Team(null, "FK Velež", "Bosna i Hercegovina", "Slaven Musa", 1922));
+        Team zrinjski = teamRepository.save(new Team(null, "HSK Zrinjski", "Bosna i Hercegovina", "Blaž Slišković", 1905));
+        Team borac = teamRepository.save(new Team(null, "FK Borac", "Bosna i Hercegovina", "Mladen Žižović", 1926));
+
+        Match match1 = matchRepository.save(new Match(null, sarajevo, zeljeznicar,
+                LocalDateTime.of(2024, 12, 20, 18, 0), "Olimpijski stadion Asim Ferhatović Hase",
+                "Premijer Liga BiH", true));
+
+        Match match2 = matchRepository.save(new Match(null, velez, zrinjski,
+                LocalDateTime.of(2024, 12, 21, 20, 0), "Stadion Rođeni",
+                "Premijer Liga BiH", false));
+
+        Match match3 = matchRepository.save(new Match(null, borac, sarajevo,
+                LocalDateTime.of(2024, 12, 22, 19, 0), "Gradski stadion",
+                "Premijer Liga BiH", false));
+
+        Match match4 = matchRepository.save(new Match(null, zeljeznicar, velez,
+                LocalDateTime.of(2024, 12, 23, 17, 30), "Stadion Grbavica",
+                "Premijer Liga BiH", true));
+
+        Match match5 = matchRepository.save(new Match(null, zrinjski, borac,
+                LocalDateTime.of(2024, 12, 24, 16, 0), "Stadion pod Bijelim Brijegom",
+                "Premijer Liga BiH", false));
+
+        playerRepository.save(new Player(null, "Edin Džeko", "Napadač", 11,
+                LocalDate.of(1986, 3, 17), "Bosna i Hercegovina", sarajevo));
+        playerRepository.save(new Player(null, "Miralem Pjanić", "Centralni vezni", 5,
+                LocalDate.of(1990, 4, 2), "Bosna i Hercegovina", sarajevo));
+        playerRepository.save(new Player(null, "Asmir Begović", "Golman", 1,
+                LocalDate.of(1987, 6, 20), "Bosna i Hercegovina", sarajevo));
+
+        playerRepository.save(new Player(null, "Zvjezdan Misimović", "Ofanzivni vezni", 10,
+                LocalDate.of(1982, 6, 5), "Bosna i Hercegovina", zeljeznicar));
+        playerRepository.save(new Player(null, "Sead Kolašinac", "Lijevi bek", 3,
+                LocalDate.of(1993, 6, 20), "Bosna i Hercegovina", zeljeznicar));
+
+        playerRepository.save(new Player(null, "Vedad Ibišević", "Napadač", 9,
+                LocalDate.of(1984, 8, 6), "Bosna i Hercegovina", velez));
+        playerRepository.save(new Player(null, "Haris Medunjanin", "Defanzivni vezni", 6,
+                LocalDate.of(1985, 3, 8), "Bosna i Hercegovina", velez));
+
+        playerRepository.save(new Player(null, "Nemanja Bilbija", "Napadač", 99,
+                LocalDate.of(1995, 9, 23), "Bosna i Hercegovina", zrinjski));
+        playerRepository.save(new Player(null, "Josip Ćorluka", "Štoper", 4,
+                LocalDate.of(1986, 4, 12), "Hrvatska", zrinjski));
+
+        playerRepository.save(new Player(null, "Stojan Vranješ", "Štoper", 5,
+                LocalDate.of(1986, 1, 8), "Bosna i Hercegovina", borac));
+        playerRepository.save(new Player(null, "Darko Maletić", "Centralni vezni", 8,
+                LocalDate.of(1993, 5, 15), "Bosna i Hercegovina", borac));
+
+        System.out.println("Baza podataka je uspješno inicijalizovana sa igračima!");
     }
 }
