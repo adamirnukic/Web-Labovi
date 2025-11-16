@@ -1,11 +1,31 @@
 package lab1.sportprenos.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "teams")
 public class Team {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
+
     private String country;
     private String coach;
     private Integer foundedYear;
+
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("team")
+    private List<Player> players = new ArrayList<>();
+
+    public Team() {
+    }
 
     public Team(Long id, String name, String country, String coach, Integer foundedYear) {
         this.id = id;
@@ -54,6 +74,12 @@ public class Team {
     public void setFoundedYear(Integer foundedYear) {
         this.foundedYear = foundedYear;
     }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(List<Player> players) {
+        this.players = players;
+    }
 }
-
-
